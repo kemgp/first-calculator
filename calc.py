@@ -67,22 +67,52 @@ def clear_all(): #clear the operations
     operator = None
     B = None
 
+def remove_zerodecimal(num):
+    if num % 1 == 0:
+        num = int(num)
+    return str(num)
+
 def button_clicked(value):
     #global because we need to access these values outside of function
     global right_symbols, top_symbols, label, A, B, operator
     
     if value in right_symbols:
-        pass
+        if value == "=": #if the equal sign is clicked, perform the operation
+            if A is not None and operator is not None:
+                B = label["text"]
+                numA = float(A)
+                numB = float(B)
+                
+                if operator == "+":
+                    label["text"] = remove_zerodecimal(numA + numB)
+                elif operator == "-":
+                    label["text"] = remove_zerodecimal(numA - numB)
+                elif operator == "÷":
+                    label["text"] = remove_zerodecimal(numA / numB)
+                elif operator == "×":
+                    label["text"] = remove_zerodecimal(numA * numB)
+
+                clear_all()
+        elif value in "×-+÷": 
+            if operator is None: #if there is no operator, store the first number and operator
+                A = label["text"]
+                operator = value
+                label["text"] = "0"
+                B = "0"
     elif value in top_symbols:
+        #clear
         if value == "AC":
             clear_all() 
             label["text"] = A #back to zero
+        #convert + numbers to -, and vice versa
         elif value == "+/-":
             result = float(label["text"]) * -1 #convert to float and multiply by negative one
-            label["text"] = str(result) #after multiplying convert back to string
+            label["text"] = remove_zerodecimal(result) #after multiplying convert back to string
+        #1%
+        elif value =="%": #same logic as converting to positive and negative 
+            result = float(label["text"])/100
+            label["text"] = remove_zerodecimal(result)
             
-        elif value =="%":
-            pass
     else:
         if value == ".":
             if value not in label["text"]: #make sure only one decimal point can be used
@@ -92,6 +122,9 @@ def button_clicked(value):
                 label["text"] = value #replace initial zero
             else:
                 label["text"] += value #leading zero replaced with value
+        elif value == "√": #find square root
+            result = float(label["text"]) ** 0.5
+            label["text"] = remove_zerodecimal(result)
 
 #open in center
 window.update()
